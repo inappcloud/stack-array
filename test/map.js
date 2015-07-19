@@ -1,24 +1,35 @@
 var assert = require('assert');
 var test = require('mocha').test;
-var array = require('..');
-var pkg = require('@inappcloud/stack').pkg;
+var map = require('..').map;
+var fn = require('@inappcloud/stack').fn;
 
-var testPkg = pkg([{
-  name: 'sort',
+function eq(actual, expected, done) {
+  try {
+    assert.deepEqual(actual, expected);
+    done();
+  } catch(e) {
+    done(e);
+  }
+}
+
+var addOne = fn({
+  name: 'addOne',
+
   args: {
-    number: {
+    value: {
       required: true
     }
   },
+
   call: function(args, done) {
-    done(args.number + 1);
+    done(args.value + 1);
   }
-}]);
+});
 
 var testCases = [
   {
     name: 'map',
-    args: { array: [1, 2, 3], fn: testPkg.sort, data: 'number', output: 'newArray' },
+    args: { array: [1, 2, 3], fn: function(x) { return addOne({ value: x }); } },
     output: [2, 3, 4]
   },
   {
@@ -30,18 +41,17 @@ var testCases = [
 
 testCases.forEach(function(testCase) {
   test(testCase.name, function(done) {
-    array.map({}, testCase.args).then(function(ctx) {
+    map(testCase.args).then(function(v) {
       if (testCase.output !== 'error') {
-        assert.equal(ctx[testCase.args.output], testCase.output);
-        done();
+        eq(v, testCase.output, done);
       } else {
-        done(new Error('Function should have returned an error'));
+        done(new Error('function should have returned an error.'));
       }
-    }).catch(function(ctx) {
+    }).catch(function(e) {
       if (testCase.output === 'error') {
         done();
       } else {
-        done(ctx.error);
+        done(e);
       }
     });
   });

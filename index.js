@@ -1,4 +1,6 @@
-var pkg = require('@inappcloud/stack').pkg;
+var fn = require('@inappcloud/stack').fn;
 var map = require('./src/map');
 
-module.exports = pkg([map]);
+module.exports = {
+  map: fn(map)
+};
