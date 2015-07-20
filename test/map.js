@@ -1,16 +1,4 @@
-var assert = require('assert');
-var test = require('mocha').test;
-var map = require('..').map;
 var fn = require('@inappcloud/stack').fn;
-
-function eq(actual, expected, done) {
-  try {
-    assert.deepEqual(actual, expected);
-    done();
-  } catch(e) {
-    done(e);
-  }
-}
 
 var addOne = fn({
   name: 'addOne',
@@ -39,20 +27,4 @@ var testCases = [
   }
 ];
 
-testCases.forEach(function(testCase) {
-  test(testCase.name, function(done) {
-    map(testCase.args).then(function(v) {
-      if (testCase.output !== 'error') {
-        eq(v, testCase.output, done);
-      } else {
-        done(new Error('function should have returned an error.'));
-      }
-    }).catch(function(e) {
-      if (testCase.output === 'error') {
-        done();
-      } else {
-        done(e);
-      }
-    });
-  });
-});
+require('@inappcloud/stack-test').runTests(require('..').map, testCases);
